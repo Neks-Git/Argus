@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Argus: readme</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #14130f;
+    --fg: #cfcab9;
+    --dim: #7a7567;
+    --accent: #a9cf8e;
+    --danger: #c96b5a;
+    --line: #2a2820;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 1.75;
+    padding: max(2rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) max(3rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+    min-height: 100dvh;
+  }
+  main { max-width: 52rem; margin: 0 auto; }
+  h1, h2, h3 { font-weight: 600; margin: 0; line-height: 1.3; }
+  h1 { color: var(--accent); font-size: 1.6rem; }
+  h2 { color: var(--accent); font-size: 1.15rem; margin: 3rem 0 1rem; padding-bottom: .4rem; border-bottom: 1px solid var(--line); }
+  h3 { color: var(--fg); font-size: 1rem; margin: 1.6rem 0 .5rem; }
+  h2::before { content: "# "; color: var(--dim); }
+  h3::before { content: "## "; color: var(--dim); }
+  p { margin: 0 0 1rem; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:hover { background: var(--accent); color: var(--bg); text-decoration: none; }
+  strong { color: var(--accent); font-weight: 600; }
+  .d { color: var(--dim); }
+  code { color: var(--accent); background: #1c1b15; padding: .05em .4em; }
+  pre { margin: 0 0 1.25rem; padding: .8rem 1rem; background: #1c1b15; border-left: 2px solid var(--accent); overflow-x: auto; font: inherit; color: var(--fg); }
+  pre.art { border-left-color: var(--dim); color: var(--dim); line-height: 1.35; }
+  ul { margin: 0 0 1rem; padding: 0; list-style: none; }
+  li { padding-left: 2ch; text-indent: -2ch; margin: .3rem 0; }
+  li::before { content: "- "; color: var(--dim); }
+  .tag { display: inline-block; font-size: .8rem; color: var(--dim); border: 1px solid var(--dim); padding: 0 .6ch; margin-right: .5ch; text-indent: 0; }
+  .tag.ok { color: var(--accent); border-color: var(--accent); }
+  .tag.warn { color: var(--danger); border-color: var(--danger); }
+
+  .hero { margin: 0 0 2rem; }
+  .hero p { margin: .4rem 0 1rem; }
+  .hero p.lead { color: var(--fg); }
+  .hero p.close { color: var(--fg); }
+  .hero p.note { color: var(--dim); margin-top: 1.5rem; }
+
+  .callout { border: 1px solid var(--line); padding: 1rem 1.25rem; margin: 0 0 1.5rem; }
+  .callout.warn { border-color: var(--danger); }
+  .callout.warn .h { color: var(--danger); }
+  .callout .h { color: var(--accent); font-weight: 600; margin-bottom: .3rem; display: block; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  details { border-top: 1px solid var(--line); }
+  details:last-of-type { border-bottom: 1px solid var(--line); }
+  summary { cursor: pointer; padding: .5rem .5rem; margin: 0 -.5rem; list-style: none; display: flex; gap: 1.5ch; color: var(--fg); }
+  summary::-webkit-details-marker { display: none; }
+  summary .k { color: var(--dim); flex: none; width: 3ch; }
+  summary .t { flex: 1; }
+  summary .s { color: var(--dim); }
+  summary:hover, summary:focus-visible { background: var(--accent); color: var(--bg); outline: none; }
+  summary:hover .k, summary:hover .s, summary:focus-visible .k, summary:focus-visible .s { color: var(--bg); }
+  details[open] > summary .k { color: var(--accent); }
+  details[open] > summary:hover .k { color: var(--bg); }
+  .body { padding: .5rem 0 1rem 4.5ch; }
+  .body dl { margin: 0; display: grid; grid-template-columns: 11ch 1fr; gap: .35rem 1.5ch; }
+  .body dt { color: var(--dim); }
+  .body dd { margin: 0; }
+  .body dd.bad { color: var(--danger); }
+  .body p { margin-bottom: .6rem; }
+
+  .shots { display: grid; gap: 1.25rem; margin: 0 0 1.5rem; }
+  .shots figure { margin: 0; }
+  .shots img { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: #1c1b15; }
+  .shots figcaption { color: var(--dim); font-size: .85rem; margin-top: .4rem; }
+  details.spoiler img { display: block; width: 100%; height: auto; border: 1px solid var(--line); margin: .5rem 0 1rem; }
+
+  .foot { margin-top: 3rem; color: var(--dim); }
+  .cursor { display: inline-block; width: .6em; height: 1.1em; background: var(--accent); vertical-align: text-bottom; animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (max-width: 40rem) {
+    .body { padding-left: 0; }
+    .body dl { grid-template-columns: 1fr; gap: 0; }
+    .body dt { margin-top: .6rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+</style>
+</head>
+<body>
+<main>
+
+<div class="hero">
+  <h1>argus</h1>
+  <p class="lead">don't you just hate alt-tabbing? switching to spotify, back to the game, missing the discord notification because you were on the steam store, opening task manager because something is loud and you don't know what it is. it's a lot of window management for stuff that should just... be there.</p>
+  <p>no? oh, that's fine. it's not that bad. but wouldn't it be nice to have everything you actually look at — browser, chat, music, files by size, cpu/ram/gpu, weather, calendar, clipboard — in one neat glassy interface that sits on your second screen and stays there? not a window you alt-tab to, just a layer that's always present. maybe even a file analyzer and a process monitor, in case you're the kind of person who opens task manager for fun.</p>
+  <p class="close">if that sounds like something you'd use, read on. if it sounds like a gimmick, honestly, fair. close the tab.</p>
+  <p class="note">two parts. <strong>part 1</strong> is short — a trust check, what it is, setup. <strong>part 2</strong> is the long, honest version: every network connection, every worst case, how to verify any program from the internet (including this one) without taking anyone's word for it.</p>
+</div>
+
+<h2>part 1: tldr</h2>
+
+<p><strong>use this if:</strong> you know me and trust me not to ship malware (hi, thanks), <strong>or</strong> you know your way around security and don't need the full explanation. everything you'd want to verify is in part 2. if you're the "just tell me if it's safe" type and don't have someone to ask to look at the source for you, honestly, part 2 is the way — it's not that long and it'll help you with every other program you install, not just this one.</p>
+
+<p><strong>what it is:</strong> a see-through desktop overlay for a second monitor. browser, discord, steam, spotify, files by size, cpu/ram/gpu, weather, calendar, clipboard history. one person's hobby project, version 0.9 (beta). free. bugs exist.</p>
+
+<p><strong>everything works without keys</strong> except spotify. no account, no telemetry, no argus server, no update pinger. it talks to a short list of services — the full list and what each one gets is in part 2.</p>
+
+<div class="callout warn">
+  <span class="h">windows will warn you when you run it</span>
+  <p>the exe is unsigned, so smart screen says "windows protected your PC." that's a reputation warning, not a virus detection. if you're going to click through, please at least read the "the windows warning" section in part 2 first — it's two paragraphs and it explains exactly what you're clicking through.</p>
+</div>
+
+<p><strong>the short version:</strong> run the installer. <code>Ctrl+Alt+Space</code> hides/shows. <code>Ctrl+Alt+V</code> opens clipboard history. <code>Ctrl+Alt+F</code> toggles fill-screen. gear icon in the dock is settings.</p>
+
+<h3>setup</h3>
+<ul>
+  <li><strong>install:</strong> run <code>Argus Setup 0.9.0.exe</code>. if asked, pick "just me." "for all users" installs to <code>C:\Program Files</code> and makes <code>config.json</code> need admin to edit.</li>
+  <li><strong>hotkeys:</strong> <code>Ctrl+Alt+Space</code> hides/shows. <code>Ctrl+Alt+V</code> opens clipboard history. <code>Ctrl+Alt+F</code> toggles fill-screen. change any of them with <code>toggleHotkey</code>, <code>clipHotkey</code>, <code>fillHotkey</code> in <code>config.json</code>.</li>
+  <li><strong>settings:</strong> gear icon in the dock. name, city, units, search engine, calendar link, glass tint and blur.</li>
+  <li><strong>spotify:</strong> create a free app at <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a>, add <code>http://127.0.0.1:8888/callback</code> as a redirect uri (exact match), put the client id in <code>config.json</code> as <code>"spotifyClientId": "..."</code>, restart, click connect.</li>
+  <li><strong>steam (optional):</strong> get a key at <a href="https://steamcommunity.com/dev/apikey" target="_blank" rel="noopener">steamcommunity.com/dev/apikey</a>, add <code>"steamApiKey": "..."</code>. steam id is auto-detected; otherwise add <code>"steamId64"</code>. unusual install location: add <code>"steamPath"</code>.</li>
+  <li><strong>calendar (optional):</strong> google calendar → settings → your calendar → secret address in iCal format → paste in argus settings. read the calendar section in part 2 first.</li>
+  <li><strong>other options:</strong> <code>display</code>, <code>mode</code> (<code>"window"</code> for a normal window), <code>width</code>, <code>height</code>, <code>clickThroughGaps</code>, <code>gpuStats</code>, <code>glassBlur</code> (<code>false</code> if slow), <code>keepWebviewsAlive</code>.</li>
+  <li><strong>paths:</strong> <code>config.json</code> lives next to <code>Argus.exe</code> — <code>%LOCALAPPDATA%\Programs\argus\config.json</code> if you picked "just me", <code>C:\Program Files\argus\config.json</code> if you picked "for all users" (that one needs admin to edit, which is why the install step says pick "just me"). settings, tokens, and clipboard history live in <code>%APPDATA%\argus</code>.</li>
+</ul>
+
+<h3>uninstall</h3>
+<p>settings → apps → argus → uninstall. then delete <code>%APPDATA%\argus</code>. it holds your settings, spotify token, clipboard history and saved images, and it does not delete itself. upside: reinstalling later brings everything back.</p>
+
+<h2>part 2: the real explanation</h2>
+
+<h3>what is argus</h3>
+<p>in greek myth, argus was the hundred-eyed giant, set by hera to watch over everything. the epithet was <em>panoptes</em>, "the all-seeing." the myth does not end great for him, but the name is cool.</p>
+<p>it's one transparent window with tiles for the stuff you actually look at. the gaps are really see-through: your wallpaper shows and clicks pass through. built with electron, tested on windows. the linux/mac branches exist but are untested, so treat them as unsupported.</p>
+<pre class="art">┌───┐ ┌───────────────────────────┐ ┌───────────┐
+│ d │ │                           │ │ clock/sky │
+│ o │ │  browser / discord /      │ ├───────────┤
+│ c │ │  steam / files / spotify  │ │ spotify   │
+│ k │ │  / etc.                   │ ├───────────┤
+│   │ │                           │ │ weather   │
+└───┘ └───────────────────────────┘ ├───────────┤
+                                    │ calendar  │
+                                    └───────────┘</pre>
+
+<h3>who it talks to,</h3>
+<p>directly from your pc. this is the full list:</p>
+<ul>
+  <li><code>accounts.spotify.com</code>, <code>api.spotify.com</code> <span class="d">(only if you connect spotify)</span></li>
+  <li><code>api.steampowered.com</code> <span class="d">(only if you add a steam api key)</span></li>
+  <li><code>cdn.cloudflare.steamstatic.com</code> <span class="d">(game cover images)</span></li>
+  <li><code>geocoding-api.open-meteo.com</code>, <code>api.open-meteo.com</code> <span class="d">(weather)</span></li>
+  <li><code>services.swpc.noaa.gov</code> <span class="d">(aurora / kp index)</span></li>
+  <li>your google calendar ics link <span class="d">(only if you paste one)</span></li>
+  <li>plus whatever sites you open in the built-in browser, discord tab or steam store tab, same as any browser</li>
+</ul>
+<p><strong>who it does not talk to:</strong> me. there is no argus server. no telemetry, no analytics, no account, no update pinger. nothing is sent to the developer because there is nowhere to send it.</p>
+
+<h3>what it looks like</h3>
+<div class="shots">
+  <figure>
+    <img src="homess.png" alt="argus home screen: dock, clock/sky, spotify, weather and calendar tiles">
+    <figcaption>home — dock, clock/sky, spotify, weather, calendar</figcaption>
+  </figure>
+  <figure>
+    <img src="statsss.png" alt="argus system stats: cpu, ram and gpu">
+    <figcaption>system stats — cpu, ram, gpu</figcaption>
+  </figure>
+  <figure>
+    <img src="spotifyss.png" alt="argus spotify tab with playback controls and playlists">
+    <figcaption>spotify tab — now playing, controls, playlists</figcaption>
+  </figure>
+  <figure>
+    <img src="steamss.png" alt="argus steam tab with installed games">
+    <figcaption>steam tab — installed games and playtime</figcaption>
+  </figure>
+</div>
+<details class="spoiler">
+  <summary><span class="k">+</span><span class="t">browser tab</span><span class="s">click to reveal</span></summary>
+  <img src="browserss.png" alt="argus browser tab with youtube open">
+</details>
+
+<h3>what is an api, what is a key</h3>
+<p>an <strong>api</strong> is a way for one program to ask another company's servers a question. a <strong>key</strong> or <strong>token</strong> is a password for a program instead of a person.</p>
+<ul>
+  <li><strong>your data doesn't go through me.</strong> it's <code>your pc → spotify</code>, <code>your pc → steam</code>, <code>your pc → open-meteo</code>. i never see your keys, songs, games or city.</li>
+  <li><strong>argus already has access to your pc,</strong> because it runs as you. keys are only for outside services. so the real trust question isn't "is the spotify key dangerous" (mostly not). it's "is this program honest." that's what the verification section is for.</li>
+</ul>
+
+<h3>what it stores on your pc, unencrypted, in plain files</h3>
+<ul>
+  <li>your settings, your spotify token, your clipboard history (text and images), your home-screen program list</li>
+  <li>any api keys or ids you put in <code>config.json</code></li>
+  <li>logged-in sessions for the built-in browser, discord and steam store, like any browser's cookies</li>
+</ul>
+
+<h3>what it can do on your pc</h3>
+<p>scan folders and delete files <em>you</em> click delete on, end processes <em>you</em> click end on, read your clipboard, listen to system audio for the visualizer. it can because it runs as you.</p>
+
+<h3>service by service</h3>
+<p class="d">tap one to open it. each lists what's sent, what's stored, the realistic worst case, and how to revoke.</p>
+
+<details>
+  <summary><span class="k">+</span><span class="t">spotify</span><span class="s">optional</span></summary>
+  <div class="body"><dl>
+    <dt>does</dt><dd>shows what's playing, play/pause/skip/seek/volume, lists and starts playlists. playback control needs premium (spotify's rule).</dd>
+    <dt>login</dt><dd>you make a free app on spotify's developer dashboard and paste its <strong>client id</strong> into <code>config.json</code>. your browser opens spotify's own login page; your password never touches argus. uses PKCE, which exists so no secret is needed. the client id is not a password.</dd>
+    <dt>asks for</dt><dd>read playback state, control playback, read currently playing, read private and collaborative playlists. no email, payment info or account settings.</dd>
+    <dt>stored</dt><dd>access and refresh token in <code>spotify.json</code>, plain text.</dd>
+    <dt>worst case</dt><dd class="bad">someone with that file can see what you play, see your playlists and control playback until you revoke. they can't log in, change your password or see your card.</dd>
+    <dt>revoke</dt><dd>spotify.com → account → apps → remove argus. delete <code>spotify.json</code>.</dd>
+    <dt>local</dt><dd>during login, a tiny server briefly listens on <code>127.0.0.1:8888</code> (your machine only) to catch the redirect. closes after login or two minutes.</dd>
+  </dl></div>
+</details>
+
+<details>
+  <summary><span class="k">+</span><span class="t">steam</span><span class="s">key optional</span></summary>
+  <div class="body"><dl>
+    <dt>no key</dt><dd>reads steam's local files (<code>appmanifest_*.acf</code>, <code>libraryfolders.vdf</code>, <code>loginusers.vdf</code>) to list installed games, detect your steam id and show download progress (polled every 3 seconds). clicking a game opens a <code>steam://</code> link.</dd>
+    <dt>with key</dt><dd>full library with playtime via <code>GetOwnedGames</code>. your profile's game details must be public. key from <code>steamcommunity.com/dev/apikey</code>, stored in <code>config.json</code>.</dd>
+    <dt>worst case</dt><dd class="bad">a leaked key lets someone make steam web api requests under your name. it can't log in, buy, trade or touch your inventory. realistic harm is a banned key. your 17-digit steam id is public anyway.</dd>
+    <dt>covers</dt><dd>cover art loads from <code>cdn.cloudflare.steamstatic.com</code>, so valve's cdn sees image requests from your ip for the games shown. that's the one place your game list leaks without a key.</dd>
+    <dt>store tab</dt><dd>if you log into the steam store inside argus, your steam <strong>account session</strong> cookies are stored in that webview. that's worth more than a spotify token. treat it like a browser login.</dd>
+    <dt>revoke</dt><dd>same api key page. for the session, sign out inside the tab or delete <code>%APPDATA%\argus</code>.</dd>
+  </dl></div>
+</details>
+
+<details>
+  <summary><span class="k">+</span><span class="t">weather (open-meteo)</span><span class="s">on by default</span></summary>
+  <div class="body"><dl>
+    <dt>sends</dt><dd>the city name you typed (to geocode it), then its coordinates for the forecast. no key, no account.</dd>
+    <dt>they see</dt><dd>your ip and the city you chose. city coordinates, not your house. pick a bigger nearby city if you care.</dd>
+    <dt>worst case</dt><dd class="bad">they know roughly where you are or what city you care about. small, reputable, open source, nothing sensitive.</dd>
+    <dt>note</dt><dd>a default city (helsinki) is pre-filled. change it in settings.</dd>
+  </dl></div>
+</details>
+
+<details>
+  <summary><span class="k">+</span><span class="t">aurora (noaa)</span><span class="s">on by default</span></summary>
+  <div class="body"><dl>
+    <dt>does</dt><dd>downloads a public json of the planetary kp index from a us government space weather service. then <em>locally</em> compares it with your weather city's latitude to guess if aurora is likely.</dd>
+    <dt>they see</dt><dd>a normal web request from your ip. your location is not sent.</dd>
+    <dt>worst case</dt><dd>nothing meaningful. the math is a rough heuristic, not a forecast.</dd>
+  </dl></div>
+</details>
+
+<details>
+  <summary><span class="k">+</span><span class="t">calendar (google ics)</span><span class="s">most sensitive</span></summary>
+  <div class="body"><dl>
+    <dt>does</dt><dd>downloads your calendar file at most every ten minutes and shows events plus dots on a month grid. read-only.</dd>
+    <dt>important</dt><dd>the "secret address in iCal format" lets <strong>anyone holding it read your entire calendar</strong>, no login. titles, times, locations, descriptions, attendees. stored in plain text in <code>settings.json</code>.</dd>
+    <dt>worst case</dt><dd class="bad">if the link leaks (screenshot, shared settings file, malicious program), someone can read your calendar until you reset it.</dd>
+    <dt>revoke</dt><dd>google calendar → settings → your calendar → integrate calendar → reset secret address. the old link dies instantly.</dd>
+    <dt>optional</dt><dd>if you don't want this risk, don't link it.</dd>
+  </dl></div>
+</details>
+
+<details>
+  <summary><span class="k">+</span><span class="t">browser, discord, steam store tabs</span><span class="s">webviews</span></summary>
+  <div class="body"><dl>
+    <dt>what</dt><dd>embedded chromium webviews. they talk to whatever you open and keep cookies and logins in separate storage for browser, discord and steam.</dd>
+    <dt>discord</dt><dd>argus doesn't read or touch discord's content. it's just discord's web app in a window.</dd>
+    <dt>identity</dt><dd>the browser says it's firefox on purpose, because some sites (discord login) behave better.</dd>
+    <dt>search</dt><dd>duckduckgo by default. pick google, bing, brave, startpage, ecosia or your own url in settings. whichever you pick sees your searches.</dd>
+    <dt>worst case</dt><dd class="bad">same as any browser: malicious sites, phishing. argus adds no protection beyond chromium. not a hardened browser.</dd>
+  </dl></div>
+</details>
+
+<h3>things that never leave your pc (but argus can do)</h3>
+<p>no network side, but a trust-me readme that left them out would be dishonest.</p>
+<ul>
+  <li><strong>clipboard history.</strong> every 0.8 seconds it saves text and images to <code>clipboard.json</code> and a <code>clips</code> folder, <strong>unencrypted</strong>. keeps up to 150 items (30 images), skips anything over 100k characters, skips items password managers mark private. if you copy a password from somewhere that doesn't mark it (a notes file, a web page), <strong>it is saved in plain text.</strong> pause and clear buttons exist; pinned items are never auto-deleted.</li>
+  <li><strong>process ending.</strong> two clicks per kill, a protected list (system, lsass, svchost, etc.), refuses to end itself, and can only end what your user can end.</li>
+  <li><strong>file analyzer.</strong> measures sizes in the folder you pick. only changes files when you click <code>bin</code> (recycle bin) or confirm "delete permanently," and only inside the scanned folder.</li>
+  <li><strong>music visualizer.</strong> the first time you open the spotify tab, argus silently starts a screen capture (video + system audio). <strong>there is no permission dialog because the app auto-approves it.</strong> the video track is dropped instantly; only audio is analyzed in memory to draw bars. nothing is recorded or sent. it stops when you close the app.</li>
+  <li><strong>temp files.</strong> each launch writes <code>argus-index.html</code> and <code>argus-preload.js</code> to your temp folder. that's the whole interface.</li>
+  <li><strong>no auto-start, no service.</strong> as far as the code goes it doesn't register to start with windows, install a service or driver, or need admin to run.</li>
+</ul>
+
+<h3>so what's the actual worst case</h3>
+<ul>
+  <li><strong>with the keys:</strong> someone sees what you play, reads your calendar (if the link leaks), or abuses your steam key. annoying, revocable in a minute, not financially or identity-critical.</li>
+  <li><strong>if the program were malicious:</strong> a hostile program running as you could read your files, clipboard and logged-in sessions and send them out. true of any program you run. the only protection is knowing it is what it claims to be.</li>
+</ul>
+
+<h3>the windows warning</h3>
+<p><strong>"Windows protected your PC: SmartScreen prevented an unrecognized app from starting."</strong> a reputation score, not a virus detection. a file lots of people ran is trusted; a file 30 people ran is "unrecognized." the fix is a code signing certificate, which costs hundreds of euros a year. this is a free hobby project, so the warning stays.</p>
+<p>an unsigned exe from a stranger is exactly what malware looks like from outside, so don't click through on anything you haven't checked. if you're happy with it: <strong>More info → Run anyway</strong>. windows usually remembers that choice for that file.</p>
+
+<h2>how to check any random program</h2>
+<p>no single check proves a program clean. each catches a different problem. none of this is specific to argus.</p>
+
+<details>
+  <summary><span class="k">1</span><span class="t">read or build the source</span><span class="s">strongest</span></summary>
+  <div class="body">
+    <p>source: <strong><a href="https://github.com/Neks-Git/Argus" target="_blank" rel="noopener">github.com/Neks-Git/Argus</a></strong>. building it yourself means you don't need to trust my exe at all. the source is a single <code>main.js</code>, a <code>package.json</code>, two icons, and a config example — nothing else. same repo, clone it and run <code>npm install &amp;&amp; npm start</code>.</p>
+
+    <p><strong>the lazy version, and it's genuinely good:</strong> it's 2026. paste the whole source tree into an llm. throw it into a couple of them, for free — deepseek, chatgpt, claude — and ask if anything looks sus: network calls, file writes, anything that phones home, anything that runs another program. you can even ask it how to run the damn thing, step by step, on your exact os. it won't <em>prove</em> the code is clean, but it's fast, it catches the obvious stuff, and it costs nothing. two models agreeing there's nothing weird is a decent signal; two models pointing at the same line is a reason to stop and look closer.</p>
+
+<pre>git clone https://github.com/Neks-Git/Argus
+cd Argus
+npm install
+npm start</pre>
+
+    <p>search for what matters: <code>fetch(</code> (every request), <code>execFile</code> / <code>child_process</code> (runs programs), <code>shell.openExternal</code>, <code>fs.promises.rm</code> / <code>shell.trashItem</code> (delete paths), <code>clipboard.readText</code> / <code>readImage</code>, <code>writeFileSync</code> (what hits disk). every <code>fetch(</code> should point at a host in the "who it talks to" list above.</p>
+  </div>
+</details>
+
+<details>
+  <summary><span class="k">2</span><span class="t">check the signature</span></summary>
+  <div class="body">
+<pre>Get-AuthenticodeSignature .\ArgusSetup0.9.0.exe | Format-List</pre>
+    <p><code>NotSigned</code> is expected for argus. for a program claiming to be from a big company, NotSigned or an odd publisher is a red flag.</p>
+  </div>
+</details>
+
+<details>
+  <summary><span class="k">3</span><span class="t">scan with defender</span></summary>
+  <div class="body">
+    <p>right-click → scan with microsoft defender, or:</p>
+<pre>Start-MpScan -ScanType CustomScan -ScanPath "C:\path\to\the\folder"</pre>
+    <p>one layer. scanners only know known bad things; new custom malware can pass.</p>
+  </div>
+</details>
+
+<details>
+  <summary><span class="k">4</span><span class="t">watch what it connects to</span><span class="s">big one</span></summary>
+  <div class="body">
+    <p>this directly tests "it only talks to these hosts."</p>
+    <ul>
+      <li><strong>resource monitor:</strong> <code>Win+R</code> → <code>resmon</code> → network → tcp connections. electron runs several processes with the same name, so check all of them.</li>
+      <li><strong>tcpview</strong> (sysinternals): live connections per process with remote addresses.</li>
+      <li><strong>wireshark:</strong> filter <code>dns</code> to see hostnames looked up.</li>
+      <li><strong>per-app firewall</strong> (simplewall, portmaster, glasswire): shows or blocks per program.</li>
+    </ul>
+    <p>start argus with no keys and no calendar. expect open-meteo, noaa and steam's image cdn, plus maybe stray windows certificate checks. a bare ip you can't explain, a domain not on the list, or lots of data going out from a weather widget is a reason to stop. https hides contents, so you see who and how much, not what. another test: add an outbound block rule and see which features break; each one maps to a connection.</p>
+  </div>
+</details>
+
+<details>
+  <summary><span class="k">5</span><span class="t">watch what it does to your system</span></summary>
+  <div class="body">
+    <ul>
+      <li><strong>process monitor:</strong> every file, registry and process action. filter by name; look for writes outside its folders or launching other programs.</li>
+      <li><strong>autoruns:</strong> run before and after installing and compare. new startup entries, services or tasks are a classic malware sign.</li>
+      <li><strong>process explorer:</strong> has a "check virustotal" option for running files.</li>
+    </ul>
+  </div>
+</details>
+
+<details>
+  <summary><span class="k">6</span><span class="t">run it somewhere disposable</span></summary>
+  <div class="body">
+    <ul>
+      <li><strong>windows sandbox</strong> (pro/enterprise/education): a throwaway windows wiped on close. you can switch networking off.</li>
+      <li><strong>a virtual machine:</strong> virtualbox, hyper-v, vmware. more setup, same idea.</li>
+      <li><strong>a separate non-admin windows user</strong> with none of your logins: a cheap middle ground.</li>
+    </ul>
+  </div>
+</details>
+
+<details>
+  <summary><span class="k">7</span><span class="t">general red flags</span></summary>
+  <div class="body">
+    <ul>
+      <li>wants admin and can't say why</li>
+      <li>installs a service, driver, extension or startup entry you didn't ask for</li>
+      <li>connects to raw ips or lots of unrelated domains</li>
+      <li>downloads and runs another exe after install, or bundles "offers"</li>
+      <li>no source, website or history, but asks for logins or payment info</li>
+      <li>tells you to turn off antivirus. never do this.</li>
+      <li>came from a dm, a comment or a "cracked" site</li>
+    </ul>
+  </div>
+</details>
+
+<h3>if you ran something and feel uneasy</h3>
+<ul>
+  <li>disconnect from the internet, run a full defender scan, then a second-opinion scanner such as malwarebytes</li>
+  <li>change important passwords from a different, clean device and turn on 2fa</li>
+  <li>sign out of all sessions that matter (discord, google, steam, spotify)</li>
+  <li>revoke any tokens or keys you gave it (revoke steps above)</li>
+  <li>check browser extensions you don't recognize (<code>chrome://extensions</code>, <code>edge://extensions</code>, <code>about:addons</code>)</li>
+  <li>if it's serious, reinstalling windows is the only way to be fully sure</li>
+</ul>
+
+<h2>why all of this</h2>
+<p>that was a lot of scary-sounding text. the reason: i'm into device security, privacy and threat modeling as a hobby, and most software you install already has the same access as argus; nobody writes it down. your browser can read every file you upload. discord can see your screen in a screenshare. a game launcher's install button is a program running as you.</p>
+<p>i could have written "free hud, it's cool" and let you click through smartscreen with no context. that's what most hobby projects do, and it trains people to click through warnings, which is how malware gets installed. so i wrote the version i'd want from a stranger: everything it can do, every service it talks to, laid out up front.</p>
+<p><strong>i can't convince you, so i won't try.</strong> i can publish source, a hash, a repo, and a determined adversary could fake any of it. "trust" is what you do when verification is impossible. so the readme gives you the facts and the tools, and you decide. if you're not comfortable, don't install it. that's a fine outcome.</p>
+<p class="d">how you probably got here: you followed a link from my discord or profile (hi); i asked you to beta test (thanks for the patience with bugs); or someone else sent it, in which case check with them, because you know them and not me.</p>
+
+<h2>last thing</h2>
+<p>this is 0.9 (beta) of a hobby project, not a product. some things will be janky. if a button does nothing, i probably forgot to test it. report bugs here: <strong><a href="https://github.com/Neks-Git/Argus/issues" target="_blank" rel="noopener">github.com/Neks-Git/Argus/issues</a></strong>.</p>
+<p>i built it because i wanted a glassy hud on my second monitor, and figured others might too. if you read all this and decide not to run it, that's a completely reasonable call, and the checks above will serve you for every other program you download.</p>
+
+<p class="foot"><span class="p" style="color:var(--accent)">neks</span> <span class="cursor"></span></p>
+
+</main>
+</body>
+</html>

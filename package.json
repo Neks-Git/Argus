@@ -1,0 +1,48 @@
+{
+  "name": "argus",
+  "version": "0.9.0",
+  "description": "glassy HUD overlay for your second screen",
+  "main": "main.js",
+  "author": "neks",
+  "license": "CC-BY-NC-SA-4.0",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "dependencies": {
+    "systeminformation": "^5.23.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.neks.argus",
+    "productName": "Argus",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "argus.png",
+      "argus.ico",
+      "!config.json",
+      "!config.example.json"
+    ],
+    "extraFiles": [
+      "config.example.json"
+    ],
+    "win": {
+      "target": ["nsis"],
+      "icon": "argus.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

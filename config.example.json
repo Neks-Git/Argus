@@ -1,0 +1,13 @@
+{
+  "spotifyClientId": "",
+  "steamApiKey": "",
+  "steamId64": "",
+  "display": null,
+  "mode": "screen",
+  "clickThroughGaps": true,
+  "gpuStats": true,
+  "toggleHotkey": "Control+Alt+Space",
+  "fillHotkey": "Control+Alt+F",
+  "clipHotkey": "Control+Alt+V",
+  "keepWebviewsAlive": false
+}

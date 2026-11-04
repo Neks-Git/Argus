@@ -1,0 +1,38 @@
+# Argus
+I REALLY RECOMEND READING THE README.HTML!! tldr below tho
+
+A transparent glass HUD for Windows. One window: home, browser, Discord,
+Steam, files, Spotify, resources, clipboard.
+
+Beta. Expect sharp edges.
+
+![Home](docs/home.png)
+
+## Features
+
+- Sidebar: notifications, daylight arc, weather, calendar, downloads, clipboard
+- Aurora forecast (NOAA Kp vs. your geomagnetic latitude)
+- Global hotkeys: `Ctrl+Alt+Space` (toggle), `Ctrl+Alt+F` (fill), `Ctrl+Alt+V` (clipboard)
+
+## Run
+
+    npm install
+    npm start
+
+Requires Electron 28+. `config.json` is created next to `main.js` on
+first launch.
+
+## Config
+
+`config.json`:
+- `spotifyClientId` — [Spotify dashboard](https://developer.spotify.com/dashboard)
+- `steamApiKey`, `steamId64` — [Steam API key](https://steamcommunity.com/dev/apikey)
+- `mode` — `screen` or `window`
+- `clickThroughGaps` — let the mouse fall through empty tiles
+
+In-app settings (location, units, calendar URL, glass blur/tint) live in
+`%APPDATA%/argus/settings.json`.
+
+## License
+
+Copyright Neks 2026 · CC BY-NC-SA 4.0
