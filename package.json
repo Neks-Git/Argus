@@ -20,10 +20,11 @@
     "appId": "com.neks.argus",
     "productName": "Argus",
     "directories": {
-      "output": "dist"
+      "output": "release"
     },
     "files": [
       "main.js",
+      "src/**/*",
       "package.json",
       "argus.png",
       "argus.ico",
