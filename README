@@ -1,38 +1,61 @@
+<div align="center">
+
 # Argus
-I REALLY RECOMEND READING THE README.HTML!! tldr below tho
 
-A transparent glass HUD for Windows. One window: home, browser, Discord,
-Steam, files, Spotify, resources, clipboard.
+**A see-through desktop overlay for your second monitor.**
 
-Beta. Expect sharp edges.
+Browser · Discord · Steam · Spotify · Files by size · System stats · Weather · Calendar · Clipboard
 
-![Home](docs/home.png)
+[**Download v0.9.0 (beta)**](https://github.com/Neks-Git/Argus/releases/tag/v0.9.0)
 
-## Features
+</div>
 
-- Sidebar: notifications, daylight arc, weather, calendar, downloads, clipboard
-- Aurora forecast (NOAA Kp vs. your geomagnetic latitude)
-- Global hotkeys: `Ctrl+Alt+Space` (toggle), `Ctrl+Alt+F` (fill), `Ctrl+Alt+V` (clipboard)
+---
 
-## Run
+## what it is
 
-    npm install
-    npm start
+One transparent window with glassy tiles for the stuff you actually look at. The gaps between tiles are really see-through — your wallpaper shows and clicks pass through to whatever's behind.
 
-Requires Electron 28+. `config.json` is created next to `main.js` on
-first launch.
+![](homess.png)
 
-## Config
+**Screenshots:** [system stats](statsss.png) · [spotify](spotifyss.png) · [steam](steamss.png) · [browser](browserss.png)
 
-`config.json`:
-- `spotifyClientId` — [Spotify dashboard](https://developer.spotify.com/dashboard)
-- `steamApiKey`, `steamId64` — [Steam API key](https://steamcommunity.com/dev/apikey)
-- `mode` — `screen` or `window`
-- `clickThroughGaps` — let the mouse fall through empty tiles
+---
 
-In-app settings (location, units, calendar URL, glass blur/tint) live in
-`%APPDATA%/argus/settings.json`.
+## install
 
-## License
+**1.** Download [`Argus-0.9.0.zip`](https://github.com/Neks-Git/Argus/releases/tag/v0.9.0) from the release page and extract it.
 
-Copyright Neks 2026 · CC BY-NC-SA 4.0
+**2.** Run `Argus Setup 0.9.0.exe`.
+
+> **Windows will prob warn you** — "Windows protected your PC." That's because the exe is unsigned, not because it's suspicious. Click **More info** → **Run anyway**. [Why this happens and how to verify the app →](Argus_%20READMEACTUALLYREADME.html)
+
+**3.** If the installer asks, pick **"just me"** — this keeps `config.json` in a folder you can edit without admin rights.
+
+**4.** Launch Argus. It works immediately — browser, discord, steam, files, stats, weather, calendar, clipboard, all fine with no setup.
+
+---
+
+## hotkeys
+
+| keys | what |
+|---|---|
+| `Ctrl+Alt+Space` | hide / show Argus |
+| `Ctrl+Alt+F` | toggle fill-screen |
+| `Ctrl+Alt+V` | open clipboard history |
+
+All three are rebindable in `config.json`.
+
+---
+
+## optional: connect spotify and steam
+
+Everything works out of the box. These two add extra functionality.
+
+### Spotify (playback controls, playlists, now-playing tile)
+
+1. Create a free app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard)
+2. Add `http://127.0.0.1:8888/callback` as a redirect URI (exact match)
+3. Copy the **client ID** into `%LOCALAPPDATA%\Programs\argus\config.json`:
+   ```json
+   "spotifyClientId": "your-client-id-here"
