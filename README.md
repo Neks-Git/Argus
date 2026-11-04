@@ -1,0 +1,223 @@
+# Argus
+
+**A see-through desktop overlay for your second monitor.**
+
+Browser · Discord · Steam · Spotify · Files · System Stats · Weather · Calendar · Clipboard
+
+[**Download Argus v0.9.0 (Beta)**](https://github.com/Neks-Git/Argus/releases/tag/v0.9.0)
+
+---
+
+## Overview
+
+Argus is a transparent desktop overlay that brings the things you regularly check into one place.
+
+Built around a collection of glass-style tiles, it sits over your desktop without getting in the way. The spaces between tiles remain fully transparent, letting your wallpaper show through and allowing clicks to pass through to the windows behind them.
+
+Designed with a second monitor in mind, but usable on any display.
+
+![Argus main interface](homess.png)
+
+**Screenshots:** [System Stats](statsss.png) · [Spotify](spotifyss.png) · [Steam](steamss.png) · [Browser](browserss.png)
+
+---
+
+## Features
+
+- **Browser** — A built-in browser tile for quick access to the web.
+- **Discord** — Keep Discord accessible from your desktop.
+- **Steam** — View Steam information and additional integration features.
+- **Spotify** — Playback controls, playlists and now-playing information.
+- **File Browser** — Browse files sorted by size.
+- **System Stats** — Keep an eye on your system's performance.
+- **Weather** — Local weather information.
+- **Calendar** — View your calendar through an iCal feed.
+- **Clipboard** — Clipboard history accessible through a global hotkey.
+- **Glass Interface** — Transparent tiles, adjustable tint and blur.
+- **Click-through Gaps** — Interact with windows behind Argus through the transparent spaces.
+
+Most features work immediately after installation. Spotify, Steam and Calendar offer optional integrations.
+
+---
+
+## Installation
+
+1. Download [`Argus-0.9.0.zip`](https://github.com/Neks-Git/Argus/releases/tag/v0.9.0) from the [Releases](https://github.com/Neks-Git/Argus/releases) page.
+2. Extract the archive.
+3. Run `Argus Setup 0.9.0.exe`.
+4. If prompted, select **Just me**.
+5. Launch Argus.
+
+**Windows SmartScreen warning**
+
+Windows may display "Windows protected your PC" when running the installer. This happens because the executable is currently unsigned.
+
+You can select **More info → Run anyway** if you've verified that you downloaded the installer from the official Argus release.
+
+[Why Windows displays this warning and how to verify Argus](Argus_%20READMEACTUALLYREADME.html)
+
+**Installation scope matters:** Selecting "For all users" installs Argus under `C:\Program Files`, which requires administrator permissions to edit `config.json`. For a normal installation, **Just me** is recommended.
+
+---
+
+## Hotkeys
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl + Alt + Space` | Hide / show Argus |
+| `Ctrl + Alt + F` | Toggle fill-screen mode |
+| `Ctrl + Alt + V` | Open clipboard history |
+
+All shortcuts can be rebound through `config.json`.
+
+| Setting | Description |
+|---|---|
+| `toggleHotkey` | Hide / show shortcut |
+| `fillHotkey` | Fill-screen shortcut |
+| `clipHotkey` | Clipboard history shortcut |
+
+---
+
+## Settings
+
+Open the **gear icon** in the dock to access Argus settings.
+
+Available options include:
+
+- Display name
+- City and weather units
+- Search engine
+- Calendar URL
+- Glass tint and blur
+
+Additional configuration is available through `config.json`.
+
+---
+
+## Optional Integrations
+
+Argus works without any API keys. The following integrations unlock additional functionality.
+
+### Spotify
+
+Enables playback controls, playlists and the now-playing tile.
+
+1. Create a free application at [Spotify Developer Dashboard](https://developer.spotify.com/dashboard).
+2. Add the following redirect URI to your application:
+
+   `http://127.0.0.1:8888/callback`
+
+   Make sure it matches exactly.
+3. Open `config.json`.
+4. Add your Spotify client ID:
+
+   ```json
+   "spotifyClientId": "your-client-id-here"
+   ```
+
+5. Restart Argus and select **Connect** in the Spotify tile.
+
+### Steam
+
+Enables additional Steam integration features.
+
+1. Get an API key from the [Steam Web API Key page](https://steamcommunity.com/dev/apikey).
+2. Add the following to `config.json`:
+
+   ```json
+   "steamApiKey": "your-api-key-here"
+   ```
+
+3. Argus attempts to detect your Steam ID automatically.
+
+If automatic detection fails, you can specify your Steam ID manually:
+
+```json
+"steamId64": "your-steam-id-64"
+```
+
+If Steam is installed in a non-standard directory, you can also specify:
+
+```json
+"steamPath": "D:\\Games\\Steam"
+```
+
+### Google Calendar
+
+Connect your Google Calendar using an iCal feed.
+
+1. Open [Google Calendar](https://calendar.google.com/).
+2. Navigate to **Settings → Settings for my calendars → Your calendar**.
+3. Find **Secret address in iCal format**.
+4. Copy the URL and paste it into Argus settings.
+
+See the calendar documentation in Part 2 for additional information.
+
+**Note:** Your iCal URL is private. Treat it like a password and don't share it publicly.
+
+---
+
+## Configuration
+
+Argus supports additional settings through `config.json`.
+
+| Setting | Description |
+|---|---|
+| `display` | Select the display Argus uses |
+| `mode` | Display mode. Use `"window"` for a normal window |
+| `width` | Window width |
+| `height` | Window height |
+| `clickThroughGaps` | Enable click-through behavior in transparent gaps |
+| `gpuStats` | Enable GPU statistics |
+| `glassBlur` | Enable or disable glass blur |
+| `keepWebviewsAlive` | Keep webviews alive when not actively displayed |
+| `toggleHotkey` | Hide / show hotkey |
+| `fillHotkey` | Fill-screen hotkey |
+| `clipHotkey` | Clipboard history hotkey |
+| `spotifyClientId` | Spotify application client ID |
+| `steamApiKey` | Steam Web API key |
+| `steamId64` | Manually specified Steam ID |
+| `steamPath` | Custom Steam installation directory |
+
+Set `glassBlur` to `false` if blur effects negatively affect performance.
+
+---
+
+## File Locations
+
+Argus stores its configuration and application data in two locations.
+
+### Configuration
+
+`config.json` is located next to `Argus.exe`.
+
+| Installation | Configuration path |
+|---|---|
+| Just me | `%LOCALAPPDATA%\Programs\argus\config.json` |
+| For all users | `C:\Program Files\argus\config.json` |
+
+The all-users installation requires administrator permissions to modify its configuration file.
+
+### Application data
+
+Settings, authentication tokens and clipboard history are stored separately in:
+
+`%APPDATA%\argus`
+
+---
+
+## Project Status
+
+**Current version:** v0.9.0 (Beta)
+
+Argus is an actively developed hobby project. Features, integrations and configuration options may change between releases.
+
+---
+
+## License
+
+See [LICENSE](LICENSE) for licensing terms.
+
+---
+
+*Built as a personal desktop project. Shared for anyone who finds it useful.*
