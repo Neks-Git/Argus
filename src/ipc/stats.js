@@ -35,17 +35,38 @@ function pollGpu(getWin, getConfig) {
   tick();
 }
 
-let _netIface = null, _netPrev = null;
+let _netPrev = null;
+
+function psNet() {
+  return new Promise((resolve) => {
+    const cmd = 'Get-NetAdapter -Physical | Get-NetAdapterStatistics | Select-Object ReceivedBytes,SentBytes | ConvertTo-Json -Compress';
+    execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', cmd],
+      { windowsHide: true, timeout: 4000 }, (err, out) => {
+        if (err) return resolve(null);
+        try {
+          let j = JSON.parse(out);
+          if (!Array.isArray(j)) j = [j];
+          resolve(j);
+        } catch { resolve(null); }
+      });
+  });
+}
+
 async function netRates() {
-  if (_netIface === null) { try { _netIface = await si.networkInterfaceDefault(); } catch { _netIface = ''; } }
-  let nets = [];
-  try { nets = await si.networkStats(_netIface || '*'); } catch {}
-  if (!nets.length && _netIface) { _netIface = ''; try { nets = await si.networkStats('*'); } catch {} }
   let rxT = 0, txT = 0;
-  for (const n of nets) {
-    if (/loopback|^lo$/i.test(n.iface || '')) continue;
-    rxT += n.rx_bytes || 0; txT += n.tx_bytes || 0;
+
+  const ps = process.platform === 'win32' ? await psNet() : null;
+  if (ps) {
+    for (const n of ps) { rxT += n.ReceivedBytes || 0; txT += n.SentBytes || 0; }
+  } else {
+    let nets = [];
+    try { nets = await si.networkStats('*'); } catch {}
+    for (const n of nets) {
+      if (/loopback|^lo$/i.test(n.iface || '')) continue;
+      rxT += n.rx_bytes || 0; txT += n.tx_bytes || 0;
+    }
   }
+
   const now = Date.now();
   let rx = 0, tx = 0;
   if (_netPrev && now > _netPrev.t) {
@@ -56,6 +77,7 @@ async function netRates() {
   _netPrev = { t: now, rxT, txT };
   return { rx, tx, rxT, txT };
 }
+
 
 let _cpuName = null;
 const PROTECTED = /^(system|system idle process|registry|smss|csrss|wininit|winlogon|services|lsass|svchost|dwm|fontdrvhost|memory compression)(\.exe)?$/i;
@@ -74,6 +96,7 @@ function register() {
   });
 
   ipcMain.handle('stats:full', async () => {
+    console.log('[IPC] stats:full REQUESTED');
     if (!si) return { error: 'systeminformation missing' };
     try {
       if (!_cpuName) { const c = await si.cpu(); _cpuName = c.brand || ''; }

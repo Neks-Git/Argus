@@ -2,6 +2,9 @@ const { app, ipcMain, shell } = require('electron');
 const path = require('path');
 const http = require('http');
 const crypto = require('crypto');
+const fs = require('fs');
+const os = require('os');
+const { spawn } = require('child_process');
 const { getConfig, readJson, writeJson } = require('../config');
 
 const tokFile = () => path.join(app.getPath('userData'), 'spotify.json');
@@ -10,6 +13,30 @@ const TOKEN_URL = 'https://accounts.spotify.com/api/token';
 const SCOPES = 'user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private playlist-read-collaborative';
 
 let _loggingIn = false;
+
+function spotifyExePath() {
+  const custom = getConfig().spotifyPath;
+  if (custom && fs.existsSync(custom)) return custom;
+  const candidates = [
+    path.join(process.env.APPDATA || '', 'Spotify', 'Spotify.exe'),
+    path.join(os.homedir(), 'AppData', 'Roaming', 'Spotify', 'Spotify.exe'),
+    'C:\\Program Files\\Spotify\\Spotify.exe',
+    'C:\\Program Files (x86)\\Spotify\\Spotify.exe',
+  ];
+  return candidates.find(p => p && fs.existsSync(p)) || null;
+}
+
+function launchSpotifyMinimized() {
+  const exe = spotifyExePath();
+  if (!exe) return { error: 'Spotify not found — is it installed?' };
+  try {
+    const child = spawn(exe, ['--minimized'], { detached: true, stdio: 'ignore' });
+    child.unref();
+    return { ok: true };
+  } catch (e) {
+    return { error: 'could not launch Spotify: ' + String(e.message || e) };
+  }
+}
 
 async function spotifyLogin() {
   if (_loggingIn) return false;
@@ -112,6 +139,8 @@ async function spotifyState() {
     progress: d.progress_ms || 0, duration: it.duration_ms || 0,
     volume: (d.device && d.device.supports_volume !== false && d.device.volume_percent != null) ? d.device.volume_percent : null,
     context: d.context ? d.context.uri : null,
+    uri: it.uri,
+    artists: (it.artists || []).map(a => ({ id: a.id, name: a.name })),
   };
 }
 
@@ -130,11 +159,14 @@ async function spotifyRaw(method, ep, params, body) {
 }
 
 let _pl = null, _plAt = 0;
+const _artCache = new Map();
 
 module.exports = {
   register() {
     ipcMain.handle('spotify:login', () => spotifyLogin());
     ipcMain.handle('spotify:state', () => spotifyState());
+    ipcMain.handle('spotify:launch', () => launchSpotifyMinimized());
+
     ipcMain.handle('spotify:control', async (_e, action, value) => {
       switch (action) {
         case 'play': return spotifyApi('PUT', '/me/player/play');
@@ -178,6 +210,72 @@ module.exports = {
         const dev = list.find(d => d.is_active) || list[0];
         if (!dev) return { error: 'open spotify on a device first' };
         r = await spotifyRaw('PUT', '/me/player/play', { device_id: dev.id }, { context_uri: uri });
+      }
+      if (r.status === 403) return { error: 'needs spotify premium' };
+      return r.status >= 200 && r.status < 300 ? { ok: true } : { error: 'spotify error ' + r.status };
+    });
+
+    ipcMain.handle('spotify:queue', async () => {
+      const r = await spotifyRaw('GET', '/me/player/queue');
+      if (r.status !== 200 || !r.json) return null;
+      const lastImg = (im) => (im && im.length ? im[im.length - 1].url : '');
+      return {
+        items: (r.json.queue || []).slice(0, 6).map(t => ({
+          title: t.name,
+          artist: (t.artists || []).map(a => a.name).join(', ') || (t.show && t.show.name) || '',
+          art: lastImg(t.album && t.album.images) || lastImg(t.images),
+        })),
+      };
+    });
+
+    ipcMain.handle('spotify:artist', async (_e, id) => {
+      if (typeof id !== 'string' || !/^[A-Za-z0-9]+$/.test(id)) return null;
+      if (_artCache.has(id)) return _artCache.get(id);
+      const r = await spotifyRaw('GET', '/artists/' + id);
+      if (r.status !== 200 || !r.json) return null;
+      const j = r.json, im = j.images || [];
+      const out = {
+        name: j.name,
+        img: (im[1] || im[0] || {}).url || '',
+        followers: j.followers && j.followers.total != null ? j.followers.total : null,
+        genres: j.genres || [],
+      };
+      _artCache.set(id, out);
+      return out;
+    });
+
+    ipcMain.handle('spotify:tracks', async (_e, id) => {
+      if (typeof id !== 'string' || !/^[A-Za-z0-9]+$/.test(id)) return { error: 'bad id' };
+      const out = [];
+      for (let off = 0; off < 500; off += 100) {
+        const q = { limit: '100', offset: String(off), additional_types: 'track' };
+        let r = await spotifyRaw('GET', '/playlists/' + id + '/items', q);
+        if (r.status === 404) r = await spotifyRaw('GET', '/playlists/' + id + '/tracks', q);
+        if (r.status === 403) return { error: "spotify won't share this playlist's tracks" };
+        if (r.status !== 200 || !r.json) return { error: 'spotify error ' + r.status };
+        for (const e of r.json.items || []) {
+          const t = e && (e.item || e.track);
+          if (!t || !t.uri || t.is_local) continue;
+          out.push({
+            uri: t.uri, title: t.name, ms: t.duration_ms || 0,
+            artist: (t.artists || []).map(a => a.name).join(', ') || (t.show && t.show.name) || '',
+          });
+        }
+        if (!r.json.next) break;
+      }
+      return { tracks: out };
+    });
+
+    ipcMain.handle('spotify:playTrack', async (_e, ctx, track) => {
+      if (![ctx, track].every(u => typeof u === 'string' && u.startsWith('spotify:'))) return { error: 'bad uri' };
+      const body = { context_uri: ctx, offset: { uri: track } };
+      let r = await spotifyRaw('PUT', '/me/player/play', null, body);
+      if (r.status === 404) {
+        const dv = await spotifyRaw('GET', '/me/player/devices');
+        const list = (dv.json && dv.json.devices) || [];
+        const dev = list.find(d => d.is_active) || list[0];
+        if (!dev) return { error: 'open spotify on a device first' };
+        r = await spotifyRaw('PUT', '/me/player/play', { device_id: dev.id }, body);
       }
       if (r.status === 403) return { error: 'needs spotify premium' };
       return r.status >= 200 && r.status < 300 ? { ok: true } : { error: 'spotify error ' + r.status };
