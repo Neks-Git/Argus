@@ -6,7 +6,7 @@ Browser · Discord · Steam · Spotify · Files · System Stats · Weather · Ca
 
 Build locally
 1. open cmd as admin - winget install OpenJS.NodeJS.LTS
-2. either cd to root folder or argus or open it in file browser, right click empty space and type npm start
+2. either cd to root folder of argus or open it in file browser, right click empty space and type npm start
 
 [**Download Argus v0.9.0 (Beta)**](https://github.com/Neks-Git/Argus/releases/tag/v0.9.0)
 
