@@ -46,7 +46,7 @@ Most features work immediately after installation. Spotify, Steam and Calendar o
 
 ## Installation
 
-1. Download [`Argus-0.9.0.zip`](https://github.com/Neks-Git/Argus/releases/tag/v0.9.0) from the [Releases](https://github.com/Neks-Git/Argus/releases) page.
+1. Download the latest build from the [Releases](https://github.com/Neks-Git/Argus/releases) page.
 2. Extract the archive.
 3. Run `Argus Setup 0.9.0.exe`.
 4. If prompted, select **Just me**.
