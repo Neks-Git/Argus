@@ -46,6 +46,20 @@ body.no-blur .side .tile, body.no-blur .dock{ backdrop-filter: none; -webkit-bac
 .dock-btn svg{ width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .dock-btn:hover{ color: var(--txt); background: var(--surface); }
 .dock-btn.active{ color: var(--txt); background: var(--surface-hi); border-color: var(--line-2); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+.dock-btn{ position: relative; }
+.dock-btn{ position: relative; }
+.dock-btn[data-badge]::after{
+  content: attr(data-badge);
+  position: absolute; top: 2px; right: 2px;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: 99px; background: #ff4d4d;
+  box-shadow: 0 0 0 2px rgba(8,8,12,.9), 0 0 10px rgba(255,77,77,.8);
+  font-size: 10px; line-height: 16px; font-weight: 700; color: #fff; text-align: center;
+  z-index: 5; pointer-events: none;
+}
+.dock-btn[data-badge=""]::after{ min-width: 10px; width: 10px; height: 10px; padding: 0; top: 4px; right: 4px; }
+.dock-btn .badge.soft{ background: rgba(255,255,255,.8); box-shadow: 0 0 0 2px rgba(8,8,12,.9); min-width: 8px; width: 8px; height: 8px; padding: 0; }
+.dock-btn .badge[hidden]{ display: none; }
 .spacer{ flex: 1; }
 .clock{ color: var(--mut); font-size: 11px; font-variant-numeric: tabular-nums; }
 .mini{ width: 30px; height: 26px; border-radius: 8px; color: var(--mut); transition: background .15s ease, color .15s ease; }
@@ -56,6 +70,7 @@ body.no-blur .side .tile, body.no-blur .dock{ backdrop-filter: none; -webkit-bac
 .main{ display: flex; flex-direction: column; transition: border-radius .4s cubic-bezier(.4,0,.2,1), border-color .4s ease, box-shadow .4s ease; }
 .panel{ display: none; flex: 1; min-height: 0; flex-direction: column; }
 .panel.active{ display: flex; }
+#p-discord:not(.active){ display:flex; position:absolute; inset:0; visibility:hidden; pointer-events:none; }
 
 .toolbar{ display: flex; gap: 6px; align-items: center; padding: 10px; flex: none; border-bottom: 1px solid var(--line); position: relative; z-index: 3; }
 .toolbar button{ width: 32px; height: 30px; border-radius: 9px; color: var(--mut); font-size: 16px; transition: background .15s ease, color .15s ease; }
@@ -653,7 +668,7 @@ body.boot-in .side > .tile:nth-child(7){ animation-delay:.67s; }
       </div>
       <button class="dock-btn active" data-panel="home" title="Home"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></button>
       <button class="dock-btn" data-panel="browser" title="Browser"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg></button>
-      <button class="dock-btn" data-panel="discord" title="Discord"><svg viewBox="0 0 24 24"><path d="M4 6.5C4 5.1 5.1 4 6.5 4h11C18.9 4 20 5.1 20 6.5v8c0 1.4-1.1 2.5-2.5 2.5H11l-4 3.5V17h-.5C5.1 17 4 15.9 4 14.5z"/><circle cx="9" cy="10.5" r="1"/><circle cx="15" cy="10.5" r="1"/></svg></button>
+      <button class="dock-btn" data-panel="discord" title="Discord"><svg viewBox="0 0 24 24"><path d="M4 6.5C4 5.1 5.1 4 6.5 4h11C18.9 4 20 5.1 20 6.5v8c0 1.4-1.1 2.5-2.5 2.5H11l-4 3.5V17h-.5C5.1 17 4 15.9 4 14.5z"/><circle cx="9" cy="10.5" r="1"/><circle cx="15" cy="10.5" r="1"/></svg><i class="badge" id="dc-badge" hidden></i></button>
       <button class="dock-btn" data-panel="steam" title="Steam"><svg viewBox="0 0 24 24"><path d="M7 8h10c2.8 0 4 2.4 4 5.5S20 18 18.5 18c-1.2 0-1.8-.8-2.5-2h-8c-.7 1.2-1.3 2-2.5 2C4 18 3 16.6 3 13.5S4.2 8 7 8z"/><path d="M8 11v3M6.5 12.5h3"/><circle cx="15.5" cy="11.5" r=".6"/><circle cx="17.5" cy="13.5" r=".6"/></svg></button>
       <button class="dock-btn" data-panel="files" title="Files"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
       <button class="dock-btn" data-panel="spotify" title="Spotify"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="16" r="2"/></svg></button>
@@ -1002,9 +1017,39 @@ function ensureWebview(name) {
   const wv = makeWebview(WEB[name], wvURLs[name] || WEB[name].url);
   $('#h-' + name).appendChild(wv);
   wvs[name] = wv;
+  if (name === 'discord') hookDiscord(wv);
   return wv;
 }
-
+const DC = { n: 0, dot: false, last: 0 };
+function dcBadge() {
+  const btn = document.querySelector('.dock-btn[data-panel="discord"]');
+  if (!btn) { hudNotify('discord', 'badge', 'button not found', 5000); return; }
+  const onDiscord = $('#p-discord').classList.contains('active');
+  const on = !onDiscord && (DC.n > 0 || DC.dot);
+  btn.style.setProperty('background', on ? '#ff4d4d' : '', 'important');
+  btn.style.setProperty('color', on ? '#fff' : '');
+  btn.title = on ? 'Discord (' + (DC.n || 'unread') + ')' : 'Discord';
+}
+function dcRead(title) {
+  if (DC.force) return;
+  try {
+    const m = /^[(]([0-9]+)[)]/.exec(title || '');
+    const n = m ? Number(m[1]) : 0;
+    const dot = !n && (title || '').trim().startsWith('•');
+    if (n > DC.n) hudNotify('discord', 'new message', n + ' unread mention' + (n > 1 ? 's' : ''));
+    DC.n = n; DC.dot = dot;
+    dcBadge();
+  } catch (err) {
+    hudNotify('discord', 'badge error', String(err), 10000);
+  }
+}
+function hookDiscord(wv) {
+  wv.addEventListener('page-title-updated', (e) => dcRead(e.title));
+  // fallback in case title events get throttled while the panel is hidden
+  setInterval(() => {
+    try { if (wvs.discord === wv) dcRead(wv.getTitle()); } catch {}
+  }, 3000);
+}
 const TABS = { list: [], active: null, seq: 0 };
 const tabById = (id) => TABS.list.find(t => t.id === id);
 const activeTab = () => tabById(TABS.active);
@@ -1129,6 +1174,7 @@ function show(name) {
     if (SPT_FS.mode !== 'off') sptSetFs('off');
   }
 }
+dcBadge();
 $$('.dock-btn').forEach(b => b.addEventListener('click', () => show(b.dataset.panel)));
 
 /* ---------- spotify fullscreen ---------- */
@@ -2541,6 +2587,7 @@ show('home');
 pollSpotify();
 pollStats();
 skyRender(); loadAurora(); loadCalendar(); dlPoll(); clipLoad();
+ensureWebview('discord');
 </script>
 </body>
 </html>
